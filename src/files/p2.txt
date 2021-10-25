@@ -1,0 +1,24 @@
+START
+ A: INT; B: INT; AUX: INT; R: INT;
+
+ BEGIN
+  READ (A);
+  READ (B);
+
+  IF A > B THEN
+   BEGIN
+    AUX := A;
+    A := B;
+    B := AUX;
+   END
+
+  WHILE R != 0 DO
+   BEGIN
+    R := B % A;
+    A := B;
+    B := R;
+   END
+
+  WRITE (A);
+ END
+ENDPRG
