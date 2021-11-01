@@ -16,7 +16,14 @@ public class Main {
 //        LexicalScanner lexicalScanner = new LexicalScanner();
 //        lexicalScanner.scanFile("src/files/p1.txt");
 
-        LexicalScanner lexicalScanner = new LexicalScanner();
-        lexicalScanner.scanProgramFile("src/files/p1err.txt");
+//        LexicalScanner lexicalScanner = new LexicalScanner();
+//        lexicalScanner.scanProgramFile("src/files/lexicalScanner/p1.txt");
+
+        FiniteAutomata finiteAutomata = new FiniteAutomata();
+        finiteAutomata.readFile("src/files/finiteAutomata/FA.in");
+        // System.out.println(finiteAutomata.toString());
+
+        UI ui = new UI(finiteAutomata);
+        ui.run();
     }
 }

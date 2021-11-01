@@ -1,6 +1,6 @@
 START
- A := 'G';
- A := -0;
+ A:=-15;
+ A := -7-10;
  A: INT; B: INT; C: INT; MX1: INT; MX: INT;
  BEGIN
   READ (A);
@@ -8,7 +8,7 @@ START
   READ (C);
 
   IF A>B THEN
-   MX1 := A;
+   MX1:=A;
   ELSE
    MX1 := B;
   IF C > MX1 THEN

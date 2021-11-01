@@ -10,9 +10,9 @@ public class LexicalScanner {
     private final SymbolTable symbolTable;
     private final ProgramInternalForm programInternalForm;
 
-    private final String tokensFileName = "src/files/token.in";
-    private final String PIFOutput = "src/files/PIF.out";
-    private final String STOutput = "src/files/ST.out";
+    private final String tokensFileName = "src/files/lexicalScanner/token.in";
+    private final String PIFOutput = "src/files/lexicalScanner/PIF.out";
+    private final String STOutput = "src/files/lexicalScanner/ST.out";
 
     public LexicalScanner() {
         this.tokens = new ArrayList<>();
