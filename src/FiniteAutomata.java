@@ -50,8 +50,10 @@ public class FiniteAutomata {
 
     private void readTransition(String line) {
         String[] lineElements = line.split(" ");
-        if(isKeyInTransitions(new Pair<>(lineElements[0], lineElements[1])))
-            getObjectFromTransitions(new Pair<>(lineElements[0], lineElements[1])).add(lineElements[2]);
+        if(isKeyInTransitions(new Pair<>(lineElements[0], lineElements[1]))) {
+            if(!getObjectFromTransitions(new Pair<>(lineElements[0], lineElements[1])).contains(lineElements[2]))
+                getObjectFromTransitions(new Pair<>(lineElements[0], lineElements[1])).add(lineElements[2]);
+        }
         else
             this.transitions.put(new Pair<>(lineElements[0], lineElements[1]), new ArrayList<>(
                     Collections.singleton(lineElements[2])));
