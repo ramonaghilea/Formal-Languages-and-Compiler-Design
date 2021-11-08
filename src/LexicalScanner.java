@@ -10,9 +10,15 @@ public class LexicalScanner {
     private final SymbolTable symbolTable;
     private final ProgramInternalForm programInternalForm;
 
-    private final String tokensFileName = "src/files/lexicalScanner/token.in";
+    private final FiniteAutomata identifierFiniteAutomata;
+    private final FiniteAutomata integerConstantFiniteAutomata;
+
+    private final String tokensFile = "src/files/lexicalScanner/token.in";
     private final String PIFOutput = "src/files/lexicalScanner/PIF.out";
     private final String STOutput = "src/files/lexicalScanner/ST.out";
+
+    private final String identifierFAFile = "src/files/finiteAutomata/identifierFA.in";
+    private final String integerConstantFAFile = "src/files/finiteAutomata/integerConstantFA.in";
 
     public LexicalScanner() {
         this.tokens = new ArrayList<>();
@@ -20,6 +26,9 @@ public class LexicalScanner {
         this.operators = Arrays.asList("+", "-", "*", "/", "%", "<", "<=", ">", ">=", "=", "!=", ":=");
         this.symbolTable = new SymbolTable();
         this.programInternalForm = new ProgramInternalForm();
+
+        this.identifierFiniteAutomata = new FiniteAutomata(identifierFAFile);
+        this.integerConstantFiniteAutomata = new FiniteAutomata(integerConstantFAFile);
 
         this.readTokensFile();
     }
@@ -60,7 +69,7 @@ public class LexicalScanner {
     }
 
     private void readTokensFile() {
-        File file = new File(this.tokensFileName);
+        File file = new File(this.tokensFile);
         Scanner scanner = null;
         try {
             scanner = new Scanner(file);
@@ -227,8 +236,7 @@ public class LexicalScanner {
     }
 
     private boolean isIdentifier(String element){
-        String identifier = "^[A-Z_]([a-zA-Z0-9_]*)$";
-        return element.matches(identifier);
+        return this.identifierFiniteAutomata.verifyAcceptedSequence(element);
     }
 
     private boolean isConstant(String element){
@@ -249,8 +257,7 @@ public class LexicalScanner {
     }
 
     private boolean isNumericalConstant(String element){
-        String numberConstant = "^([1-9][0-9]*)|0$";
-        return element.matches(numberConstant);
+        return this.integerConstantFiniteAutomata.verifyAcceptedSequence(element);
     }
 
     private boolean isBooleanConstant(String element){
