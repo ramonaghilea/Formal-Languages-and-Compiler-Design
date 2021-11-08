@@ -5,20 +5,24 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class FiniteAutomata {
-    private List<String> Q;
-    private List<String> E;
-    private String q0;
-    private List<String> F;
-    private Map<Pair<String, String>, String> d;
+    private List<String> states;
+    private List<String> alphabet;
+    private String startingSymbol;
+    private List<String> finalStates;
+    private Map<Pair<String, String>, List<String>> transitions;
 
-    public FiniteAutomata() {
-        this.Q = new ArrayList<>();
-        this.E = new ArrayList<>();
-        this.F = new ArrayList<>();
-        this.d = new HashMap<>();
+    private String fileName;
+
+    public FiniteAutomata(String fileName) {
+        this.states = new ArrayList<>();
+        this.alphabet = new ArrayList<>();
+        this.finalStates = new ArrayList<>();
+        this.transitions = new HashMap<>();
+        this.fileName = fileName;
+        readFile();
     }
 
-    public void readFile(String fileName) {
+    public void readFile() {
         File file = new File(fileName);
         Scanner scanner = null;
         try {
@@ -27,13 +31,10 @@ public class FiniteAutomata {
             e.printStackTrace();
         }
 
-        Q = readLine(scanner.nextLine());
-        E = readLine(scanner.nextLine());
-        q0 = readLine(scanner.nextLine()).get(0);
-        F = readLine(scanner.nextLine());
-
-        // read the line with "d ="
-        scanner.nextLine();
+        states = readLine(scanner.nextLine());
+        alphabet = readLine(scanner.nextLine());
+        startingSymbol = readLine(scanner.nextLine()).get(0);
+        finalStates = readLine(scanner.nextLine());
 
         // read the transitions
         while (scanner.hasNextLine()) {
@@ -42,42 +43,90 @@ public class FiniteAutomata {
         }
     }
 
-    public List<String> readLine(String line) {
+    private List<String> readLine(String line) {
         String[] lineElements = line.split(" ");
-        List<String> lineElementsAsList = Arrays.asList(lineElements);
-        return lineElementsAsList.subList(2, lineElementsAsList.size());
+        return Arrays.asList(lineElements);
     }
 
-    public void readTransition(String line) {
-        String[] lineElements = line.split("->");
-        String[] pair = lineElements[0].split(",");
-        this.d.put(new Pair<>(pair[0].trim(), pair[1].trim()), lineElements[1].trim());
+    private void readTransition(String line) {
+        String[] lineElements = line.split(" ");
+        if(isKeyInTransitions(new Pair<>(lineElements[0], lineElements[1])))
+            getObjectFromTransitions(new Pair<>(lineElements[0], lineElements[1])).add(lineElements[2]);
+        else
+            this.transitions.put(new Pair<>(lineElements[0], lineElements[1]), new ArrayList<>(
+                    Collections.singleton(lineElements[2])));
+    }
+
+    private boolean isKeyInTransitions(Pair<String, String> key) {
+        for(Pair<String, String> i: this.transitions.keySet()) {
+            if(i.getFirst().equals(key.getFirst()) && i.getSecond().equals(key.getSecond()))
+                return true;
+        }
+        return false;
+    }
+
+    private List<String> getObjectFromTransitions(Pair<String, String> key) {
+        for(Pair<String, String> i: this.transitions.keySet()) {
+            if(i.getFirst().equals(key.getFirst()) && i.getSecond().equals(key.getSecond()))
+                return this.transitions.get(i);
+        }
+        return List.of();
+    }
+
+    private boolean isDFA() {
+        for(Pair<String, String> key: this.transitions.keySet()) {
+            if(getObjectFromTransitions(key).size() > 1)
+                return false;
+        }
+        return true;
+    }
+
+    public boolean verifyAcceptedSequence(String sequence) {
+        // The Finite Automata is not a deterministic one.
+        if(!isDFA())
+            return false;
+
+        String currentSymbol = this.startingSymbol;
+        for(int i = 0; i < sequence.length(); i++) {
+            if(isKeyInTransitions(new Pair<>(currentSymbol, Character.toString(sequence.charAt(i)))))
+                currentSymbol = getObjectFromTransitions(new Pair<>(currentSymbol, Character.toString(sequence.charAt(i)))).get(0);
+            else
+                return false;
+        }
+
+        // The symbol is not a final symbol.
+        if(!this.finalStates.contains(currentSymbol))
+            return false;
+
+        return true;
     }
 
     @Override
     public String toString() {
         return "FiniteAutomata{" +
-                "Q=" + Q +
-                ", E=" + E +
-                ", q0='" + q0 + '\'' +
-                ", F=" + F +
-                ", d=" + d +
+                "Q=" + states +
+                ", E=" + alphabet +
+                ", q0='" + startingSymbol + '\'' +
+                ", F=" + finalStates +
+                ", d=" + transitions +
                 '}';
     }
 
-    public List<String> getQ() {
-        return Q;
+    public List<String> getStates() {
+        return states;
     }
 
-    public List<String> getE() {
-        return E;
+    public List<String> getAlphabet() {
+        return alphabet;
     }
 
-    public List<String> getF() {
-        return F;
+    public List<String> getFinalStates() {
+        return finalStates;
     }
 
-    public Map<Pair<String, String>, String> getD() {
-        return d;
+    public Map<Pair<String, String>, List<String>> getTransitions() {
+        return transitions;
     }
+
+    public String getStartingSymbol() { return startingSymbol; }
 }
