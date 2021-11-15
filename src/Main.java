@@ -1,3 +1,6 @@
+import Parser.Grammar;
+import Parser.UI;
+
 public class Main {
     public static void main(String[] args) {
 //        SymbolTable symbolTable = new SymbolTable();
@@ -18,15 +21,15 @@ public class Main {
 //        lexicalScanner.scanProgramFile("src/files/lexicalScanner/p1.txt");
 
 
-        FiniteAutomata finiteAutomata = new FiniteAutomata("src/files/finiteAutomata/FA.in");
-        System.out.println(finiteAutomata);
-
-        System.out.println(finiteAutomata.verifyAcceptedSequence("01"));
-        System.out.println(finiteAutomata.verifyAcceptedSequence("011"));
-        System.out.println(finiteAutomata.verifyAcceptedSequence("0"));
-        System.out.println(finiteAutomata.verifyAcceptedSequence("010"));
-        System.out.println(finiteAutomata.verifyAcceptedSequence("0111"));
-        System.out.println(finiteAutomata.verifyAcceptedSequence("01111"));
+//        FiniteAutomata finiteAutomata = new FiniteAutomata("src/files/finiteAutomata/FA.in");
+//        System.out.println(finiteAutomata);
+//
+//        System.out.println(finiteAutomata.verifyAcceptedSequence(""));
+//        System.out.println(finiteAutomata.verifyAcceptedSequence("011"));
+//        System.out.println(finiteAutomata.verifyAcceptedSequence("0"));
+//        System.out.println(finiteAutomata.verifyAcceptedSequence("010"));
+//        System.out.println(finiteAutomata.verifyAcceptedSequence("0111"));
+//        System.out.println(finiteAutomata.verifyAcceptedSequence("01111"));
 
 //        FiniteAutomata finiteAutomata = new FiniteAutomata("src/files/finiteAutomata/NDFA.in");
 //        System.out.println(finiteAutomata);
@@ -61,8 +64,20 @@ public class Main {
 //        System.out.println(integerConstantFiniteAutomata.verifyAcceptedSequence("-100"));
 //        System.out.println(integerConstantFiniteAutomata.verifyAcceptedSequence("-100A"));
 
-        UI ui = new UI(finiteAutomata);
-        System.out.println(ui.getFAAsString());
-        ui.run();
+//        UI ui = new UI(finiteAutomata);
+//        System.out.println(ui.getFAAsString());
+        //ui.run();
+
+        Grammar g2 = new Grammar("src/Parser/files/g2.txt");
+        System.out.println(g2);
+        System.out.println(g2.isCFG());
+        System.out.println(g2.getProductionsForNonterminal("program"));
+
+        Grammar g1 = new Grammar("src/Parser/files/g1.txt");
+        System.out.println(g1);
+        System.out.println(g1.isCFG());
+
+        UI parserUI = new UI(g1);
+        parserUI.run();
     }
 }

@@ -1,0 +1,21 @@
+program declllist compstmt declaration type stmtlist stmt simple_stmt assign_stmt expression term io_stmt struct_stmt ifstmt whilestmt condition RELATION
+START END identifier const INT BOOLEAN CHAR STRING ARRAY ; : [ ] BEGIN := ( ) + * - / % READ WRITE IF THEN ELSE WHILE DO < <= = > >= != AND OR
+program
+program -> START decllist compstmt ENDPRG
+decllist -> declaration ; | declaration ; decllist
+declaration -> identifier : type
+simple_type -> INT | BOOLEAN | CHAR | STRING
+array_type -> ARRAY [ INT ] simple_type
+type -> simple_type | array_type
+compstmt -> BEGIN stmtlist END
+stmtlist -> stmt ; | stmt ; stmtlist
+stmt -> simple_stmt | struct_stmt
+simple_stmt -> assign_stmt | io_stmt
+assign_stmt -> identifier := expression
+term -> identifier | const
+io_stmt -> READ ( identifier ) | WRITE ( identifier )
+struct_stmt -> compstmt | ifstmt | whilestmt
+ifstmt -> IF condition THEN stmt | IF condition THEN stmt ELSE stmt
+whilestmt -> WHILE condition DO stmt
+condition -> expression RELATION expression
+RELATION -> < | <= | = | > | >= | != | AND | OR
