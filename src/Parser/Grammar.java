@@ -8,7 +8,7 @@ public class Grammar {
     private List<String> nonterminals;
     private List<String> terminals;
     private String startingSymbol;
-    private Map<String, List<String>> productions;
+    private Map<List<String>, List<List<String>>> productions;
 
     private String fileName;
 
@@ -48,31 +48,46 @@ public class Grammar {
     private void readProduction(String line) {
         String[] lineElements = line.split(" -> ");
         String[] rhsElements = lineElements[1].split(" \\| ");
-        if(this.productions.containsKey(lineElements[0])) {
-            this.productions.get(lineElements[0]).addAll(List.of(rhsElements));
+        String[] lhsElements = lineElements[0].split(" ");
+        List<String> lhsElementsAsList = new ArrayList<>(List.of(lhsElements));
+
+        for (String rhsElement : rhsElements) {
+            if(this.productions.containsKey(lhsElementsAsList)) {
+                String[] elementsInRhsElements = rhsElement.split(" ");
+                List<String> elementsInRhsElementAsList = new ArrayList<>(List.of(elementsInRhsElements));
+                this.productions.get(lhsElementsAsList).add(elementsInRhsElementAsList);
+            }
+            else {
+                String[] elementsInRhsElements = rhsElement.split(" ");
+                List<String> elementsInRhsElementAsList = new ArrayList<>(List.of(elementsInRhsElements));
+                List<List<String>> rhsElementsAsList = new ArrayList<>();
+                rhsElementsAsList.add(elementsInRhsElementAsList);
+                this.productions.put(lhsElementsAsList, rhsElementsAsList);
+            }
         }
-        else
-            this.productions.put(lineElements[0], new ArrayList<String>(List.of(rhsElements)));
     }
 
     public boolean isCFG() {
         if(!this.nonterminals.contains(this.startingSymbol))
             return false;
-        for(String key: this.productions.keySet()) {
-            if(!this.nonterminals.contains(key))
+
+        for(List<String> key: this.productions.keySet()) {
+            if(key.size() > 1)
                 return false;
 
-            for(String element: this.productions.get(key)) {
-                for(int i = 0; i < element.length(); i++) {
-                    String charAsString = Character.toString(element.charAt(i));
-                    if (!this.nonterminals.contains(charAsString) &&
-                            !(this.terminals.contains(charAsString)) &&
-                            !(charAsString.equals("E")))
+            if(!this.nonterminals.contains(key.get(0)))
+                return false;
+
+            for(List<String> rhsElement: this.productions.get(key)) {
+                for(String elementInRhsElement: rhsElement) {
+                    if (!this.nonterminals.contains(elementInRhsElement) &&
+                            !(this.terminals.contains(elementInRhsElement)) &&
+                            !(elementInRhsElement.equals("E"))) {
                         return false;
+                    }
                 }
             }
         }
-
         return true;
     }
 
@@ -94,12 +109,12 @@ public class Grammar {
         return terminals;
     }
 
-    public Map<String, List<String>> getProductions() {
+    public Map<List<String>, List<List<String>>> getProductions() {
         return productions;
     }
 
-    public List<String> getProductionsForNonterminal(String nonterminal) {
-        return productions.get(nonterminal);
+    public List<List<String>> getProductionsForNonterminal(String nonterminal) {
+        return productions.get(new ArrayList<>(List.of(nonterminal)));
     }
 
     public String getStartingSymbol() { return startingSymbol; }

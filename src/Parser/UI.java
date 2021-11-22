@@ -3,6 +3,7 @@ package Parser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class UI {
     private Grammar grammar;
@@ -56,12 +57,25 @@ public class UI {
         return result;
     }
 
+    private String getRhsElementAsString(List<String> rhsElement) {
+        String result = "";
+        for(int i = 0; i < rhsElement.size() - 1; i++)
+            result += rhsElement.get(i) + " ";
+        result += rhsElement.get(rhsElement.size() - 1);
+
+        return result;
+    }
+
     private String getProductionsAsString() {
         String result = "Productions = { \n";
-        for(String element: this.grammar.getProductions().keySet()) {
-            result += element + " -> " + this.grammar.getProductionsForNonterminal(element).get(0);
-            for(int i = 1; i < this.grammar.getProductionsForNonterminal(element).size(); i++)
-                result += " | " + this.grammar.getProductionsForNonterminal(element).get(i);
+        for(List<String> element: this.grammar.getProductions().keySet()) {
+            for(int i = 0; i < element.size() - 1; i++)
+                result += element.get(i) + " ";
+            result += element.get(element.size() - 1);
+
+            result += element + " -> " + this.grammar.getProductionsForNonterminal(element.get(0)).get(0);
+            for(int i = 1; i < this.grammar.getProductionsForNonterminal(element.get(0)).size(); i++)
+                result += " | " + getRhsElementAsString(this.grammar.getProductionsForNonterminal(element.get(0)).get(i));
             result += "\n";
         }
         result += "}";
@@ -71,13 +85,15 @@ public class UI {
 
     private String getProductionsForNonterminalAsString() {
         String nonterminal = readStringFromConsole();
-        String result = nonterminal + " -> ";
-        for(String element: this.grammar.getProductionsForNonterminal(nonterminal)) {
-            result += element + " | ";
-        }
+        List<List<String>> productionsForNonterminal = this.grammar.getProductionsForNonterminal(nonterminal);
 
-        result.substring(result.length() - 3);
+        String result = nonterminal + " -> ";
+        for(int i = 1; i < productionsForNonterminal.size() - 1; i++) {
+            result += getRhsElementAsString(productionsForNonterminal.get(i)) + " | ";
+        }
+        result += getRhsElementAsString(productionsForNonterminal.get(productionsForNonterminal.size() - 1));
         result += "\n";
+
         return result;
     }
 

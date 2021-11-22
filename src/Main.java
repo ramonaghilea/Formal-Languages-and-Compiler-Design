@@ -1,4 +1,5 @@
 import Parser.Grammar;
+import Parser.LL1Parser;
 import Parser.UI;
 
 public class Main {
@@ -70,14 +71,17 @@ public class Main {
 
         Grammar g2 = new Grammar("src/Parser/files/g2.txt");
         System.out.println(g2);
-        System.out.println(g2.isCFG());
+        System.out.println("Is CFG: " + g2.isCFG());
         System.out.println(g2.getProductionsForNonterminal("program"));
-
+//
         Grammar g1 = new Grammar("src/Parser/files/g1.txt");
         System.out.println(g1);
-        System.out.println(g1.isCFG());
+        System.out.println("Is CFG: " + g1.isCFG());
 
-        UI parserUI = new UI(g1);
-        parserUI.run();
+        //UI parserUI = new UI(g1);
+        //parserUI.run();
+
+        LL1Parser ll1Parser = new LL1Parser(g1);
+
     }
 }
