@@ -1,0 +1,23 @@
+START
+ #
+ A := 'G
+ B := -0
+ C := 6-9
+
+ a: INT; I: INT; Result: BOOLEAN;
+
+ BEGIN
+  READ (a);
+  Result := True;
+  I := 2;
+
+  WHILE I < (a / 2) DO
+   BEGIN
+    IF a % I = 0 THEN
+     Result := false;
+    I := I + 1;
+   END
+
+  WRITE (Result);
+ END
+ENDPRG

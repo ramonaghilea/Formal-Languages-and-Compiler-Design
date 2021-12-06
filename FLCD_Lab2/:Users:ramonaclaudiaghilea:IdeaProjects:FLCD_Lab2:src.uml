@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/Users/ramonaclaudiaghilea/IdeaProjects/FLCD_Lab2/src</OriginalElement>
+  <nodes>
+    <node x="243.0" y="183.0">ProgramInternalForm</node>
+    <node x="84.0" y="376.0">LexicalScanner</node>
+    <node x="-321.4012738853503" y="150.0">SymbolTable</node>
+    <node x="765.2101910828026" y="218.0">Errors.LexicalError</node>
+    <node x="293.5" y="0.0">utils.Pair</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="ProgramInternalForm" target="utils.Pair" relationship="CREATE">
+      <point x="-62.75" y="-50.0" />
+      <point x="305.75" y="125.0" />
+      <point x="331.0" y="125.0" />
+      <point x="-37.5" y="50.0" />
+    </edge>
+    <edge source="LexicalScanner" target="ProgramInternalForm" relationship="TO_ONE">
+      <point x="-79.75" y="-237.0" />
+      <point x="163.75" y="356.0" />
+      <point x="96.796875" y="356.0" />
+      <point x="96.796875" y="346.0" />
+      <point x="305.75" y="346.0" />
+      <point x="-62.75" y="50.0" />
+    </edge>
+    <edge source="LexicalScanner" target="ProgramInternalForm" relationship="CREATE">
+      <point x="79.75" y="-237.0" />
+      <point x="323.25" y="356.0" />
+      <point x="373.5" y="356.0" />
+      <point x="373.5" y="336.0" />
+      <point x="431.25" y="336.0" />
+      <point x="62.75" y="50.0" />
+    </edge>
+    <edge source="ProgramInternalForm" target="utils.Pair" relationship="TO_MANY">
+      <point x="62.75" y="-50.0" />
+      <point x="431.25" y="125.0" />
+      <point x="406.0" y="125.0" />
+      <point x="37.5" y="50.0" />
+    </edge>
+    <edge source="LexicalScanner" target="Errors.LexicalError" relationship="CREATE">
+      <point x="79.75" y="-237.0" />
+      <point x="323.25" y="356.0" />
+      <point x="373.5" y="356.0" />
+      <point x="373.5" y="336.0" />
+      <point x="837.7101910828026" y="336.0" />
+      <point x="0.0" y="15.0" />
+    </edge>
+    <edge source="LexicalScanner" target="SymbolTable" relationship="TO_ONE">
+      <point x="-79.75" y="-237.0" />
+      <point x="163.75" y="356.0" />
+      <point x="96.796875" y="356.0" />
+      <point x="96.796875" y="346.0" />
+      <point x="-265.6512738853503" y="346.0" />
+      <point x="-55.75" y="83.0" />
+    </edge>
+    <edge source="LexicalScanner" target="SymbolTable" relationship="CREATE">
+      <point x="79.75" y="-237.0" />
+      <point x="323.25" y="356.0" />
+      <point x="373.5" y="356.0" />
+      <point x="373.5" y="336.0" />
+      <point x="-154.1512738853503" y="336.0" />
+      <point x="55.75" y="83.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.5413793103448276" showDependencies="true" x="329.5" y="425.0" />
+  <SelectedNodes>
+    <node>Errors.LexicalError</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
