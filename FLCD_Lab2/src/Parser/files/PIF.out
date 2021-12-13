@@ -1,0 +1,1 @@
+START identifier : INT ; BEGIN READ ( identifier ) ; END ENDPRG

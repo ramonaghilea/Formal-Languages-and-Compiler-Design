@@ -3,18 +3,26 @@ package Parser;
 import Errors.ParsingTableConflictError;
 import utils.Pair;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class LL1Parser {
     private Grammar grammar;
+    private String inputFile;
+    private String outputFile;
+
     private Map<String, Set<String>> first;
     private Map<String, Set<String>> follow;
     private Map<String, Map<String, Pair<List<String>, Integer>>> table;
 
     private Map<Integer, Pair<List<String>, List<String>>> numberToProduction;
 
-    public LL1Parser(Grammar grammar) {
+    public LL1Parser(Grammar grammar, String inputFile, String outputFile) {
         this.grammar = grammar;
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
+
         this.first = new HashMap<>();
         this.follow = new HashMap<>();
         this.numberToProduction = new HashMap<>();
@@ -39,9 +47,33 @@ public class LL1Parser {
         }
         System.out.println("\n");
 
-        constructParsingTable();
+        try {
+            constructParsingTable();
+            System.out.println(table);
+            List<String> sequence = readFile();
+            analyseSequence(sequence);
+        } catch (ParsingTableConflictError e) {
+            System.out.println(e.getMessage());
+        }
 
-        System.out.println(table);
+        //System.out.println(table);
+    }
+
+    public List<String> readFile() {
+        File file = new File(this.inputFile);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return readLine(scanner.nextLine());
+    }
+
+    private List<String> readLine(String line) {
+        String[] lineElements = line.split(" ");
+        return Arrays.asList(lineElements);
     }
 
     private void initializeParsingTable() {
@@ -94,86 +126,6 @@ public class LL1Parser {
 
         return newSet;
     }
-
-//    private void computeFirst() {
-//        List<String> nonterminals = this.grammar.getNonterminals();
-//        for(String nonterminal: nonterminals) {
-//            this.first.put(nonterminal, new HashSet<>());
-//        }
-//
-//        List<String> terminals = this.grammar.getTerminals();
-//        for(String terminal: terminals) {
-//            this.first.put(terminal, new HashSet<>());
-//        }
-//
-//        Map<List<String>, List<List<String>>> productions = this.grammar.getProductions();
-//
-//        // initialization
-//        for(String nonterminal: nonterminals) {
-//            List<List<String>> productionsForNonterminal = this.grammar.getProductionsForNonterminal(nonterminal);
-//            for(List<String> rhsElement: productionsForNonterminal) {
-//                // check if the first element in the list is a terminal and if it is, add it to the firstSet
-//                // if it is E, add it to the firstSet
-//                if(terminals.contains(rhsElement.get(0)) || rhsElement.get(0).equals("E"))
-//                    this.first.get(nonterminal).add(rhsElement.get(0));
-//            }
-//        }
-//        for(String terminal: terminals) {
-//            // first for a terminal is itself
-//            this.first.get(terminal).add(terminal);
-//        }
-//
-//        // loop
-//        boolean isFirstSetChanged = true;
-//        while(isFirstSetChanged) {
-//            isFirstSetChanged = false;
-//
-//            for(List<String> key: productions.keySet()) {
-//                for(List<String> rhsElement: productions.get(key)) {
-//                    Set<String> firstCopy = first.get(key.get(0));
-//                    Set<String> concatenationResult = new HashSet<>();
-//
-//                    if(rhsElement.get(0).equals("E"))
-//                    {
-//                        continue;
-//                    }
-//                    else if(rhsElement.size() == 1)
-//                    {
-//                        if(terminals.contains(rhsElement.get(0)))
-//                            concatenationResult.add(rhsElement.get(0));
-//                        else
-//                            concatenationResult.addAll(this.first.get(rhsElement.get(0)));
-//                    }
-//                    else {
-//                        // compute the concatenation of len 1 for the previous first sets of the elements in the current rhsElement
-//                        concatenationResult = concatenationOfLenOneForSets(this.first.get(rhsElement.get(0)),
-//                                this.first.get(rhsElement.get(1)));
-//                        for (int i = 2; i < rhsElement.size(); i++) {
-//                            concatenationResult = concatenationOfLenOneForSets(concatenationResult,
-//                                    this.first.get(rhsElement.get(i)));
-//                        }
-//                    }
-//
-//                    firstCopy.addAll(concatenationResult);
-//
-//                    if(!firstCopy.equals(first.get(key.get(0)))) {
-//                        isFirstSetChanged = true;
-//                        // update first
-//                        this.first.get(key.get(0)).addAll(firstCopy);
-//                    }
-//
-//                }
-//            }
-//        }
-//
-//        System.out.println("FIRST");
-//        for(String key: first.keySet()) {
-//            if(grammar.isNonterminal(key)) {
-//                System.out.println(key + " " + first.get(key));
-//            }
-//        }
-//        System.out.println("\n");
-//    }
 
     private void computeFirst() {
         List<String> nonterminals = this.grammar.getNonterminals();
@@ -380,9 +332,7 @@ public class LL1Parser {
         }
     }
 
-    public List<Integer> analyseSequence(String sequence) {
-        String[] sequenceElements = sequence.split(" ");
-        List<String> sequenceElementsAsList = Arrays.asList(sequenceElements);
+    public List<Integer> analyseSequence(List<String> sequenceElementsAsList) {
 
         Stack<String> inputStack = new Stack<>();
         Stack<String> workingStack = new Stack<>();
@@ -410,6 +360,8 @@ public class LL1Parser {
                 parsing = false;
                 System.out.println("Sequence not accepted.");
                 System.out.println("Error for symbol " + workingStack.peek());
+
+                return new ArrayList<>();
             } else {
                 Pair<List<String>, Integer> elementInTable =
                         table.get(workingStack.peek()).get(inputStack.peek());
@@ -435,10 +387,13 @@ public class LL1Parser {
                     System.out.println("Sequence accepted.");
                     System.out.println(output);
 
-                    for(Integer index : output) {
-                        System.out.println(numberToProduction.get(index).getFirst());
-                        System.out.println(numberToProduction.get(index).getSecond());
-                    }
+//                    for(Integer index : output) {
+//                        System.out.println(numberToProduction.get(index).getFirst());
+//                        System.out.println(numberToProduction.get(index).getSecond());
+//                    }
+                    ParserOutput parserOutput = new ParserOutput(output, numberToProduction, grammar);
+                    parserOutput.printToConsole();
+                    parserOutput.printToFile(this.outputFile);
                 }
             }
         }

@@ -28,6 +28,9 @@ public class ParserOutput {
     }
 
     private void transformOutputIntoTree() {
+        if(productionsAsNumbersList.size() == 0)
+            return;
+
         int currentNodeIndex = 0;
         int currentProductionIndex = 0;
         Stack<Node> nodeStack = new Stack<>();
@@ -42,7 +45,7 @@ public class ParserOutput {
         nodeStack.push(root);
 
         while(currentProductionIndex < productionsAsNumbersList.size() && !nodeStack.isEmpty()) {
-            System.out.println(nodeStack);
+            //System.out.println(nodeStack);
 
             Node currentNode = nodeStack.pop();
 

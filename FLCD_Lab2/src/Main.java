@@ -87,18 +87,22 @@ public class Main {
         //UI parserUI = new UI(g1);
         //parserUI.run();
 
-//        LL1Parser ll1Parser = new LL1Parser(g3);
+        LL1Parser ll1Parserg3 = new LL1Parser(g3, "src/Parser/files/seq.txt", "src/Parser/files/out3.txt");
 //        List<Integer> output = ll1Parser.analyseSequence("( int ) + int");
 //
 //        ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g3);
+
+
+        //LL1Parser ll1Parser = new LL1Parser(g1);
+        // List<Integer> output = ll1Parser.analyseSequence("a c a");
+
+//        ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g3);
 //        parserOutput.printToConsole();
-//        parserOutput.printToFile("src/Parser/files/out3.txt");
+//        parserOutput.printToFile("src/Parser/files/out1.txt");
 
-        LL1Parser ll1Parser = new LL1Parser(g1);
-        List<Integer> output = ll1Parser.analyseSequence("a c a");
-
-        ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g3);
-        parserOutput.printToConsole();
-        parserOutput.printToFile("src/Parser/files/out1.txt");
+        LL1Parser ll1Parserg2 = new LL1Parser(g2, "src/Parser/files/PIF.out", "src/Parser/files/out2.txt");
+        //ll1Parser.analyseSequence("START identifier : INT ; BEGIN READ ( identifier ) ; END ENDPRG");
+//
+        //ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g2);
     }
 }
