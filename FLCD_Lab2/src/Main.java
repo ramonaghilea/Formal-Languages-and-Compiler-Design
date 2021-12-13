@@ -1,6 +1,8 @@
 import Parser.Grammar;
 import Parser.LL1Parser;
-import Parser.UI;
+import Parser.ParserOutput;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -85,7 +87,18 @@ public class Main {
         //UI parserUI = new UI(g1);
         //parserUI.run();
 
-        LL1Parser ll1Parser = new LL1Parser(g3);
+//        LL1Parser ll1Parser = new LL1Parser(g3);
+//        List<Integer> output = ll1Parser.analyseSequence("( int ) + int");
+//
+//        ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g3);
+//        parserOutput.printToConsole();
+//        parserOutput.printToFile("src/Parser/files/out3.txt");
 
+        LL1Parser ll1Parser = new LL1Parser(g1);
+        List<Integer> output = ll1Parser.analyseSequence("a c a");
+
+        ParserOutput parserOutput = new ParserOutput(output, ll1Parser.getNumberToProduction(), g3);
+        parserOutput.printToConsole();
+        parserOutput.printToFile("src/Parser/files/out1.txt");
     }
 }

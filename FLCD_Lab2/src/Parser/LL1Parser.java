@@ -1,5 +1,6 @@
 package Parser;
 
+import Errors.ParsingTableConflictError;
 import utils.Pair;
 
 import java.util.*;
@@ -10,21 +11,40 @@ public class LL1Parser {
     private Map<String, Set<String>> follow;
     private Map<String, Map<String, Pair<List<String>, Integer>>> table;
 
+    private Map<Integer, Pair<List<String>, List<String>>> numberToProduction;
+
     public LL1Parser(Grammar grammar) {
         this.grammar = grammar;
         this.first = new HashMap<>();
         this.follow = new HashMap<>();
+        this.numberToProduction = new HashMap<>();
 
-        initializeTable();
+        initializeParsingTable();
 
         computeFirst();
+
+        System.out.println("FIRST");
+        for(String key: first.keySet()) {
+            if(grammar.isNonterminal(key)) {
+                System.out.println(key + " " + first.get(key));
+            }
+        }
+        System.out.println("\n");
+
         computeFollow();
-        constructTable();
+
+        System.out.println("FOLLOW");
+        for(String key: follow.keySet()) {
+            System.out.println(key + " " + follow.get(key));
+        }
+        System.out.println("\n");
+
+        constructParsingTable();
 
         System.out.println(table);
     }
 
-    private void initializeTable() {
+    private void initializeParsingTable() {
         this.table = new HashMap<>();
         List<String> nonterminals = this.grammar.getNonterminals();
         List<String> terminals = this.grammar.getTerminals();
@@ -35,18 +55,22 @@ public class LL1Parser {
                 this.table.get(nonterminal).put(terminal, null);
             }
         }
+
         this.table.put("$", new HashMap<>());
         for(String terminal: terminals) {
             this.table.get("$").put(terminal, null);
         }
-        this.table.get("$").put("$", new Pair<>(new ArrayList<>(Collections.singleton("acc")), 0));
+        this.table.get("$").put("$",
+                new Pair<>(new ArrayList<>(Collections.singleton("acc")), 0));
 
         for(String terminal: terminals) {
             this.table.put(terminal, new HashMap<>());
             for(String terminal2: terminals) {
                 if(terminal.equals(terminal2))
-                    this.table.get(terminal).put(terminal2, new Pair<>(new ArrayList<>(Collections.singleton("pop")), 0));
-                this.table.get(terminal).put(terminal2, null);
+                    this.table.get(terminal).put(terminal2,
+                            new Pair<>(new ArrayList<>(Collections.singleton("pop")), 0));
+                else
+                    this.table.get(terminal).put(terminal2, null);
             }
         }
     }
@@ -217,32 +241,19 @@ public class LL1Parser {
                     }
 
                     this.first.get(key.get(0)).addAll(concatenationResult);
-
-//                    if(!firstCopy.equals(first.get(key.get(0)))) {
-//                        isFirstSetChanged = true;
-//                        // update first
-//                        this.first.get(key.get(0)).addAll(firstCopy);
-//                    }
-
                 }
             }
 
+            // check if there were any modifications in the first set
+            // if there were, continue the loop, otherwise end the algorithm
             for(String nonterminal: nonterminals) {
                 if (!first.get(nonterminal).equals(previousFirst.get(nonterminal))) {
                     isFirstSetChanged = true;
-                    // update previousFollow
+                    // update previousFirst
                     previousFirst.get(nonterminal).addAll(first.get(nonterminal));
                 }
             }
         }
-
-        System.out.println("FIRST");
-        for(String key: first.keySet()) {
-            if(grammar.isNonterminal(key)) {
-                System.out.println(key + " " + first.get(key));
-            }
-        }
-        System.out.println("\n");
     }
 
     private void computeFollow() {
@@ -264,54 +275,32 @@ public class LL1Parser {
             isFollowSetChanged = false;
 
             for(String nonterminal: nonterminals) {
-                // create a copy to compare it with the previous one
-                //Set<String> followCopyForNonterminal = follow.get(nonterminal);
 
                 for (List<String> key : productions.keySet()) {
                     for (List<String> rhsElement : productions.get(key)) {
                         for (int index = 0; index < rhsElement.size(); index++) {
 
                             String currentNonterminalForFollow = rhsElement.get(index);
-                            //System.out.println("terminalfollow: " + currentNonterminalForFollow);
 
-                            if(! currentNonterminalForFollow.equals(nonterminal))
+                            if(!currentNonterminalForFollow.equals(nonterminal))
                                 continue;
 
-//                            if (grammar.isNonterminal(currentNonterminalForFollow)) {
+                            // get the firstSet for the following symbol
+                            Set<String> firstSetForFollowingSymbol = new HashSet<>();
+                            if (index < rhsElement.size() - 1)
+                                firstSetForFollowingSymbol = first.get(rhsElement.get(index + 1));
+                            else
+                                this.follow.get(nonterminal).addAll(previousFollow.get(key.get(0)));
 
-//                                // create a copy to compare it with the previous one
-//                                Set<String> followCopyForNonterminal = follow.get(currentNonterminalForFollow);
-
-                                // get the firstSet for the following symbol
-                                Set<String> firstSetForFollowingSymbol = new HashSet<>();
-                                if (index < rhsElement.size() - 1)
-                                    firstSetForFollowingSymbol = first.get(rhsElement.get(index + 1));
-                                else
+                            for (String elementInFirstSet : firstSetForFollowingSymbol) {
+                                if (elementInFirstSet.equals("E"))
                                     this.follow.get(nonterminal).addAll(previousFollow.get(key.get(0)));
-
-                                for (String elementInFirstSet : firstSetForFollowingSymbol) {
-                                    //System.out.println(key);
-                                    if (elementInFirstSet.equals("E"))
-                                        this.follow.get(nonterminal).addAll(previousFollow.get(key.get(0)));
-                                    else
-                                        this.follow.get(nonterminal).addAll(first.get(rhsElement.get(index + 1)));
-                                }
-
-//                                if (!followCopyForNonterminal.equals(follow.get(currentNonterminalForFollow))) {
-//                                    isFollowSetChanged = true;
-//                                    // update follow
-//                                    this.follow.get(currentNonterminalForFollow).addAll(followCopyForNonterminal);
-//                                }
-//                            }
+                                else
+                                    this.follow.get(nonterminal).addAll(first.get(rhsElement.get(index + 1)));
+                            }
                         }
                     }
                 }
-
-//                if (!follow.get(nonterminal).equals(previousFollow.get(nonterminal))) {
-//                    isFollowSetChanged = true;
-//                    // update follow
-//                    //this.follow.get(nonterminal).addAll(followCopyForNonterminal);
-//                }
             }
 
             for(String nonterminal: nonterminals) {
@@ -322,21 +311,19 @@ public class LL1Parser {
                 }
             }
         }
-
-        System.out.println("FOLLOW");
-        for(String key: follow.keySet()) {
-            System.out.println(key + " " + follow.get(key));
-        }
     }
 
-    private void constructTable() {
+    private void constructParsingTable() {
         Map<List<String>, List<List<String>>> productions = this.grammar.getProductions();
 
         int indexOfProduction = 0;
         for(List<String> key: productions.keySet()) {
             for(List<String> rhsElement: productions.get(key)) {
                 indexOfProduction++;
+                numberToProduction.put(indexOfProduction, new Pair<>(new ArrayList<>(key),
+                        new ArrayList<>(rhsElement)));
 
+                // compute first for the rhs of every production
                 Set<String> firstConcatenationResult = new HashSet<>();
                 if(rhsElement.size() > 1) {
                     firstConcatenationResult =
@@ -353,15 +340,39 @@ public class LL1Parser {
                     else
                         firstConcatenationResult = this.first.get(rhsElement.get(0));
                 }
-                //System.out.println(rhsElement);
+
+
+                // populate the table
                 for(String element: firstConcatenationResult) {
                     if(!element.equals("E"))
-                        this.table.get(key.get(0)).put(element, new Pair<>(rhsElement, indexOfProduction));
+                        // table(key, terminal) = (rhs, indexOfProduction)
+                        if(this.table.get(key.get(0)).get(element) == null)
+                            this.table.get(key.get(0)).put(element,
+                                    new Pair<>(rhsElement, indexOfProduction));
+                        else
+                            throw new ParsingTableConflictError(key.get(0), element,
+                                    this.table.get(key.get(0)).get(element).toString(),
+                                    new Pair<>(rhsElement, indexOfProduction).toString());
                     else
                     {
                         for(String elementInFollowKey: this.follow.get(key.get(0))) {
-                            if(!elementInFollowKey.equals("E"))
-                                this.table.get(key.get(0)).put(elementInFollowKey, new Pair<>(rhsElement, indexOfProduction));
+                            if(!elementInFollowKey.equals("E")) {
+                                if(this.table.get(key.get(0)).get(elementInFollowKey) == null)
+                                    this.table.get(key.get(0)).put(elementInFollowKey,
+                                            new Pair<>(rhsElement, indexOfProduction));
+                                else
+                                    throw new ParsingTableConflictError(key.get(0), elementInFollowKey,
+                                            this.table.get(key.get(0)).get(elementInFollowKey).toString(),
+                                            new Pair<>(rhsElement, indexOfProduction).toString());
+                            }
+                            else
+                                if(this.table.get(key.get(0)).get("$") == null)
+                                    this.table.get(key.get(0)).put("$",
+                                            new Pair<>(rhsElement, indexOfProduction));
+                                else
+                                    throw new ParsingTableConflictError(key.get(0), "$",
+                                            this.table.get(key.get(0)).get("$").toString(),
+                                            new Pair<>(rhsElement, indexOfProduction).toString());
                         }
                     }
                 }
@@ -369,7 +380,73 @@ public class LL1Parser {
         }
     }
 
-    public void evaluateSequence(List<String> sequence) {
-        
+    public List<Integer> analyseSequence(String sequence) {
+        String[] sequenceElements = sequence.split(" ");
+        List<String> sequenceElementsAsList = Arrays.asList(sequenceElements);
+
+        Stack<String> inputStack = new Stack<>();
+        Stack<String> workingStack = new Stack<>();
+        List<Integer> output = new ArrayList<>();
+
+        inputStack.push("$");
+        for (int i = sequenceElementsAsList.size() - 1; i >= 0; i--)
+            inputStack.push(sequenceElementsAsList.get(i));
+
+        workingStack.push("$");
+        workingStack.push(grammar.getStartingSymbol());
+
+        boolean parsing = true;
+        while (parsing) {
+            System.out.println(inputStack);
+            System.out.println(workingStack);
+            System.out.println(output);
+            System.out.println("\n");
+
+            if(workingStack.peek().equals("E"))
+                workingStack.pop();
+
+            if (table.get(workingStack.peek()).get(inputStack.peek()) == null) {
+                // error
+                parsing = false;
+                System.out.println("Sequence not accepted.");
+                System.out.println("Error for symbol " + workingStack.peek());
+            } else {
+                Pair<List<String>, Integer> elementInTable =
+                        table.get(workingStack.peek()).get(inputStack.peek());
+                if (elementInTable.getSecond() != 0) {
+                    // push
+
+                    // pop the lhs of the production from the working stack and push the rhs
+                    workingStack.pop();
+                    for (int i = elementInTable.getFirst().size() - 1; i >= 0; i--)
+                        workingStack.push(elementInTable.getFirst().get(i));
+
+                    // add the index of the production to the output
+                    output.add(elementInTable.getSecond());
+                } else if (elementInTable.getFirst().get(0).equals("pop")) {
+                    // pop
+
+                    // pop from the input stack and the working stack
+                    inputStack.pop();
+                    workingStack.pop();
+                } else {
+                    // acc
+                    parsing = false;
+                    System.out.println("Sequence accepted.");
+                    System.out.println(output);
+
+                    for(Integer index : output) {
+                        System.out.println(numberToProduction.get(index).getFirst());
+                        System.out.println(numberToProduction.get(index).getSecond());
+                    }
+                }
+            }
+        }
+
+        return output;
+    }
+
+    public Map<Integer, Pair<List<String>, List<String>>> getNumberToProduction() {
+        return numberToProduction;
     }
 }
