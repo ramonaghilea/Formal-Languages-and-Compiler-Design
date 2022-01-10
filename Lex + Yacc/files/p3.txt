@@ -1,0 +1,18 @@
+START
+ N: INT; SUM: INT; I: INT; X: INT;
+
+ BEGIN
+  READ (N);
+  SUM := 0;
+  I := 0;
+
+  WHILE I < N DO
+   BEGIN
+    READ (X);
+    SUM := SUM + X;
+    I := I + 1;
+   END
+
+  WRITE (SUM);
+ END
+ENDPRG

@@ -1,0 +1,5 @@
+START A : INT ;
+BEGIN
+READ ( A ) ;
+ENDPRG
+

@@ -1,0 +1,31 @@
+START
+ A := -0
+ A:=-15;
+ A := -7 - 10;
+ A: INT; B: INT; C: INT; MX1: INT; MX: INT;
+ BEGIN
+  READ (A);
+  READ (B);
+  READ (C);
+
+  IF A > B THEN
+   BEGIN
+    MX1 := A ;
+   END
+  ELSE
+   BEGIN
+    MX1 := B ;
+   END  
+  
+  IF C > MX1 THEN
+   BEGIN  
+    MX := C ;
+   END
+  ELSE
+   BEGIN
+    MX := MX1 ;
+   END
+
+  WRITE (MX) ;
+ END
+ENDPRG

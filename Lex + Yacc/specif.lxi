@@ -1,0 +1,75 @@
+%{
+#include "y.tab.h" 	 
+#include <math.h> 
+%}
+ 
+NONZERO_DIGIT 	[1-9]
+DIGIT 		[0-9]
+INTEGER_CT	0|(-?{NONZERO_DIGIT}{DIGIT}*)
+CHAR_CT		\'[A-Z0-9]\'
+STRING_CT	\"[A-Z0-9]*\"
+BOOLEAN_CT	true|false
+ID 		[A-Z_][A-Z0-9_]*
+ERROR		[+-]0|0{DIGIT}+|{DIGIT}+[A-Z0-9_]+
+%% 
+
+"START"		{ return START;}
+"ENDPRG"	{ return ENDPRG; }
+"INT"		{ return INT; }
+"BOOLEAN"	{ return BOOLEAN; }
+"CHAR"		{ return CHAR; }
+"STRING"	{ return STRING;}
+"ARRAY"		{ return ARRAY; }
+"BEGIN"		{ return BEGIN_STMT; }
+"END"		{ return END; }
+"READ"		{ return READ; }
+"WRITE"		{ return WRITE; }
+"IF"		{ return IF; }
+"THEN"		{ return THEN; }
+"ELSE"		{ return ELSE; }
+"WHILE"		{ return WHILE; }
+"DO"		{ return DO; }
+
+"+"		{ return ADD; }
+" - "		{ return SUBTRACT; }
+"*"		{ return MULTIPLY; }
+"/"		{ return DIV; }
+"%"		{ return MOD; }
+"<"		{ return SMALLER; }
+"<="		{ return SMALLER_OR_EQUAL; }
+">"		{ return GREATER; }
+">="		{ return GREATER_OR_EQUAL; }
+"="		{ return EQUAL; }
+"!="		{ return DIFFERENT; }
+":="		{ return ASSIGNED; }
+"AND"		{ return AND; }
+"OR"		{ return OR; }
+
+"("		{ return PARA_OPEN; }
+")"		{ return PARA_CLOSED; }
+"["		{ return SQUARE_BRACKET_OPEN; }
+"]"		{ return SQUARE_BRACKET_CLOSED; }
+"{"		{ return CURLY_BRACKET_OPEN; }
+"}"		{ return CURLY_BRACKET_CLOSED; }
+";"		{ return SEMI_COLON; }
+":"		{ return COLON; } 
+
+{ERROR}		printf("Error: %s\n", yytext);
+
+{INTEGER_CT}    { printf("Integer constant: %s\n", yytext); return ct;}
+
+{CHAR_CT}    { printf("Char constant: %s\n", yytext); return ct; }
+
+{STRING_CT}    { printf("String: %s\n", yytext); return ct; }
+
+{BOOLEAN_CT}    { printf("Boolean constant: %s\n", yytext); return ct; }
+
+{ID}            { return id; }
+
+"{"[^}\n]*"}" 		/* eat up one-line comments */ 
+
+[ \t\n]+ 		/* eat up whitespace */ 
+		 
+
+. printf("Eroare\n");
+%% 
